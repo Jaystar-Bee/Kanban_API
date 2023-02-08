@@ -1,0 +1,26 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "Kanban API is an restful API for task management for developers or any corperate workers\n\nIt is a standalone API",
+    "title": "KanBan API",
+    "contact": {
+      "name": "John Ayilara",
+      "url": "https://bolu.netlify.app",
+      "email": "jbayilara@gmail.com"
+    },
+    "version": "1.0.0"
+  },
+  "host": "localhost",
+  "basePath": "/api/v1/",
+  "paths": {}
+}
