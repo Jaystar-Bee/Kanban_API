@@ -22,5 +22,68 @@
   },
   "host": "localhost",
   "basePath": "/api/v1/",
-  "paths": {}
+  "paths": {
+    "/boards": {
+      "get": {
+        "description": "Produces\napplication/json",
+        "tags": [
+          "Boards"
+        ],
+        "summary": "This route get all the boards created by the user",
+        "operationId": "GetAllBoards",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/BoardReply"
+          },
+          "500": {}
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Board": {
+      "description": "Board is the model for board",
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "user_id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/ObjectID"
+        },
+        "name": {
+          "description": "Name of the board",
+          "type": "string",
+          "x-go-name": "Name",
+          "example": "My Board"
+        },
+        "user_id": {
+          "description": "User ID of the board",
+          "type": "string",
+          "x-go-name": "UserID",
+          "example": "5e4d3b5b6b6b6b6b6b6b6b6b"
+        }
+      },
+      "x-go-package": "kanban-task/model"
+    },
+    "ObjectID": {
+      "type": "array",
+      "title": "ObjectID is the BSON ObjectID type.",
+      "items": {
+        "type": "integer",
+        "format": "uint8"
+      },
+      "x-go-package": "go.mongodb.org/mongo-driver/bson/primitive"
+    }
+  },
+  "responses": {
+    "BoardReply": {
+      "description": "Board reply is the model for board reply",
+      "schema": {
+        "$ref": "#/definitions/Board"
+      }
+    }
+  }
 }

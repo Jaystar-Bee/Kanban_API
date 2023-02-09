@@ -47,7 +47,7 @@ func init() {
 	ctx, boardCollection, columnCollection, taskCollection = initializer.MongoConnect()
 	redisClient = initializer.RedisConnect()
 	boardHandler = handlers.NewBoardHandler(ctx, boardCollection, columnCollection, taskCollection, redisClient)
-	columnHandler = handlers.NewColumnHandler(ctx, columnCollection, taskCollection, redisClient)
+	columnHandler = handlers.NewColumnHandler(ctx, boardCollection, taskCollection, redisClient)
 	taskHandler = handlers.NewTaskHandler(ctx, taskCollection, redisClient)
 }
 
@@ -63,11 +63,11 @@ func main() {
 	boardRoute.PUT("/:id", boardHandler.UpdateBoard)
 
 	columnRoute := initRoute.Group("/columns")
-	columnRoute.GET("/", columnHandler.ListColumnHandler)
-	columnRoute.POST("/:id", columnHandler.InsertColumnHandler)
-	columnRoute.GET("/:id", columnHandler.GetColumnHandler)
-	columnRoute.DELETE("/:id", columnHandler.DeleteColumnHandler)
-	columnRoute.PUT("/:id", columnHandler.UpdateColumnHandler)
+	columnRoute.GET("/:id", columnHandler.ListColumnHandler)
+	// columnRoute.POST("/:id", columnHandler.InsertColumnHandler)
+	// columnRoute.GET("/:id", columnHandler.GetColumnHandler)
+	// columnRoute.DELETE("/:id", columnHandler.DeleteColumnHandler)
+	// columnRoute.PUT("/:id", columnHandler.UpdateColumnHandler)
 
 	taskRoute := initRoute.Group("/tasks")
 	taskRoute.GET("/", taskHandler.ListTaskHandler)

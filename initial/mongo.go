@@ -30,7 +30,7 @@ func MongoConnect() (ctx context.Context, boardCollection *mongo.Collection, col
 	log.Println("Connected to MongoDB")
 
 	boardCollection = client.Database("kanban").Collection("board")
-	columnCollection = client.Database("kaban").Collection("column")
+	columnCollection = client.Database("kanban").Collection("column")
 	taskCollection = client.Database("kanban").Collection("task")
 
 	return ctx, boardCollection, columnCollection, taskCollection

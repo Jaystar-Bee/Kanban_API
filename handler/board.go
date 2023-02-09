@@ -47,9 +47,8 @@ func NewBoardHandler(
 // -application/json
 //
 // Responses:
-//	200: model.Board
-//	500:
-// "message": err
+//	200: BoardReply
+//	500: ErrorReply
 //
 
 func (handler *BoardHandler) ListBoardHandler(c *gin.Context) {
@@ -74,6 +73,14 @@ func (handler *BoardHandler) InsertBoardHandler(c *gin.Context) {
 	}
 	board.UserID = "UI5f9f1b9c1c9d440000a1e1f1"
 	board.ID = primitive.NewObjectID()
+	var columns []model.Column
+
+	for _, column := range board.Columns {
+		column.ID = primitive.NewObjectID()
+		columns = append(columns, column)
+	}
+	board.Columns = columns
+
 	_, err := handler.boardCollection.InsertOne(handler.ctx, board)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -94,16 +101,12 @@ func (handler *BoardHandler) GetBoard(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, board)
 }
+
 func (handler *BoardHandler) DeleteBoard(c *gin.Context) {
 	var id = c.Param("id")
 	objectID, _ := primitive.ObjectIDFromHex(id)
 
 	board, err := handler.boardCollection.DeleteOne(handler.ctx, bson.M{"_id": objectID})
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	column, err := handler.columnCollection.DeleteMany(handler.ctx, bson.M{"board_id": objectID})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -115,10 +118,9 @@ func (handler *BoardHandler) DeleteBoard(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":       "Board deleted successfully",
-		"boardMessage":  board,
-		"columnMessage": column,
-		"taskMessage":   task,
+		"message":      "Board deleted successfully",
+		"boardMessage": board,
+		"taskMessage":  task,
 	})
 
 }
@@ -133,7 +135,19 @@ func (handler *BoardHandler) UpdateBoard(c *gin.Context) {
 			"message": err.Error(),
 		})
 	}
-	update := bson.D{{"$set", bson.D{{"name", board.Name}}}}
+
+	var columns []model.Column
+
+	for _, column := range board.Columns {
+		column.ID = primitive.NewObjectID()
+		columns = append(columns, column)
+	}
+	board.Columns = columns
+
+	update := bson.D{{"$set", bson.D{
+		{"name", board.Name},
+		{"Columns", board.Columns},
+	}}}
 
 	res, err := handler.boardCollection.UpdateOne(handler.ctx, bson.D{{"_id", objectID}}, update)
 	if err != nil {
