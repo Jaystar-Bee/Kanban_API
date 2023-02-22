@@ -15,15 +15,13 @@ import (
 type ColumnHandler struct {
 	ctx             context.Context
 	boardCollection *mongo.Collection
-	taskCollection  *mongo.Collection
 	redisClient     *redis.Client
 }
 
-func NewColumnHandler(ctx context.Context, boardCollection *mongo.Collection, taskCollection *mongo.Collection, redisClient *redis.Client) *ColumnHandler {
+func NewColumnHandler(ctx context.Context, boardCollection *mongo.Collection, redisClient *redis.Client) *ColumnHandler {
 	return &ColumnHandler{
 		ctx:             ctx,
 		boardCollection: boardCollection,
-		taskCollection:  taskCollection,
 		redisClient:     redisClient,
 	}
 }

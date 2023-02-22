@@ -17,13 +17,13 @@ type Column struct {
 	// required: true
 	//
 	// example: My Column
-	Name string `json:"name" bson:"name"`
+	Name string `json:"name" bson:"name" validate:"required, min=2, max=20"`
 	// Color of the column
 	//
 	// required: true
 	//
 	// example: #000000
-	Color string `json:"color" bson:"color"`
+	Color string `json:"color" bson:"color" validate:"required, min=2, max=10"`
 }
 
 // // Board ID of the column

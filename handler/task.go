@@ -71,6 +71,15 @@ func (handler *TaskHandler) InsertTaskHandler(c *gin.Context) {
 	task.BoardID = boardID
 	task.UserID = c.Param("id")
 	task.ID = primitive.NewObjectID()
+	// Give subTask ID
+	var subTasks []model.SubTask
+	for _, subTask := range task.SubTasks {
+		if subTask.ID == primitive.NilObjectID {
+			subTask.ID = primitive.NewObjectID()
+		}
+		subTasks = append(subTasks, subTask)
+	}
+	task.SubTasks = subTasks
 	result, err := handler.collection.InsertOne(handler.ctx, task)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -136,6 +145,14 @@ func (handler *TaskHandler) UpdateTaskHandler(c *gin.Context) {
 			"message": err.Error(),
 		})
 	}
+	var subTasks []model.SubTask
+	for _, subTask := range task.SubTasks {
+		if subTask.ID == primitive.NilObjectID {
+			subTask.ID = primitive.NewObjectID()
+		}
+		subTasks = append(subTasks, subTask)
+	}
+	task.SubTasks = subTasks
 
 	filter := bson.M{"_id": taskID}
 

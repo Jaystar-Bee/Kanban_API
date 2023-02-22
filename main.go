@@ -22,39 +22,53 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 
+	"kanban-task/auths"
 	handlers "kanban-task/handler"
 	initializer "kanban-task/initial"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var (
-	PORT             = ":3000"
-	boardCollection  *mongo.Collection
-	columnCollection *mongo.Collection
-	taskCollection   *mongo.Collection
-	ctx              context.Context
-	redisClient      *redis.Client
-	boardHandler     *handlers.BoardHandler
-	columnHandler    *handlers.ColumnHandler
-	taskHandler      *handlers.TaskHandler
+	PORT            = ":3000"
+	boardCollection *mongo.Collection
+	userCollection  *mongo.Collection
+	taskCollection  *mongo.Collection
+	ctx             context.Context
+	redisClient     *redis.Client
+	boardHandler    *handlers.BoardHandler
+	columnHandler   *handlers.ColumnHandler
+	authHandler     *handlers.AuthHandler
+	taskHandler     *handlers.TaskHandler
 )
 
 func init() {
-	ctx, boardCollection, columnCollection, taskCollection = initializer.MongoConnect()
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Unable to load .env")
+	}
+
+	ctx, boardCollection, userCollection, taskCollection = initializer.MongoConnect()
 	redisClient = initializer.RedisConnect()
-	boardHandler = handlers.NewBoardHandler(ctx, boardCollection, columnCollection, taskCollection, redisClient)
-	columnHandler = handlers.NewColumnHandler(ctx, boardCollection, taskCollection, redisClient)
+	boardHandler = handlers.NewBoardHandler(ctx, boardCollection, taskCollection, redisClient)
+	columnHandler = handlers.NewColumnHandler(ctx, boardCollection, redisClient)
+	authHandler = handlers.NewAuthHandler(ctx, userCollection)
 	taskHandler = handlers.NewTaskHandler(ctx, taskCollection, redisClient)
 }
 
 func main() {
 	router := gin.Default()
 	initRoute := router.Group("/api/v1")
+	userRoute := initRoute.Group("/users")
+	userRoute.POST("/signup", authHandler.SignUp)
+	userRoute.POST("/signin", authHandler.SignIn)
 
+	initRoute.Use(auths.AuthMiddleware(redisClient))
 	boardRoute := initRoute.Group("/boards")
 	boardRoute.GET("/", boardHandler.ListBoardHandler)
 	boardRoute.POST("/", boardHandler.InsertBoardHandler)
@@ -64,10 +78,6 @@ func main() {
 
 	columnRoute := initRoute.Group("/columns")
 	columnRoute.GET("/:id", columnHandler.ListColumnHandler)
-	// columnRoute.POST("/:id", columnHandler.InsertColumnHandler)
-	// columnRoute.GET("/:id", columnHandler.GetColumnHandler)
-	// columnRoute.DELETE("/:id", columnHandler.DeleteColumnHandler)
-	// columnRoute.PUT("/:id", columnHandler.UpdateColumnHandler)
 
 	taskRoute := initRoute.Group("/tasks")
 	taskRoute.GET("/", taskHandler.ListTaskHandler)

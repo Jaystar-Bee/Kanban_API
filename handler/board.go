@@ -16,26 +16,23 @@ import (
 var err error
 
 type BoardHandler struct {
-	ctx              context.Context
-	boardCollection  *mongo.Collection
-	columnCollection *mongo.Collection
-	taskCollection   *mongo.Collection
-	redisClient      *redis.Client
+	ctx             context.Context
+	boardCollection *mongo.Collection
+	taskCollection  *mongo.Collection
+	redisClient     *redis.Client
 }
 
 func NewBoardHandler(
 	ctx context.Context,
 	boardCollection *mongo.Collection,
-	columnCollection *mongo.Collection,
 	taskCollection *mongo.Collection,
 	redisClient *redis.Client,
 ) *BoardHandler {
 	return &BoardHandler{
-		ctx:              ctx,
-		boardCollection:  boardCollection,
-		columnCollection: boardCollection,
-		taskCollection:   boardCollection,
-		redisClient:      redisClient,
+		ctx:             ctx,
+		boardCollection: boardCollection,
+		taskCollection:  taskCollection,
+		redisClient:     redisClient,
 	}
 }
 
@@ -139,7 +136,9 @@ func (handler *BoardHandler) UpdateBoard(c *gin.Context) {
 	var columns []model.Column
 
 	for _, column := range board.Columns {
-		column.ID = primitive.NewObjectID()
+		if column.ID == primitive.NilObjectID {
+			column.ID = primitive.NewObjectID()
+		}
 		columns = append(columns, column)
 	}
 	board.Columns = columns

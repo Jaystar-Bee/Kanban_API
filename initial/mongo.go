@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func MongoConnect() (ctx context.Context, boardCollection *mongo.Collection, columnCollection *mongo.Collection, taskCollection *mongo.Collection) {
+func MongoConnect() (ctx context.Context, boardCollection *mongo.Collection, userCollection *mongo.Collection, taskCollection *mongo.Collection) {
 
 	ctx = context.Background()
 	err := godotenv.Load(".env")
@@ -30,8 +30,8 @@ func MongoConnect() (ctx context.Context, boardCollection *mongo.Collection, col
 	log.Println("Connected to MongoDB")
 
 	boardCollection = client.Database("kanban").Collection("board")
-	columnCollection = client.Database("kanban").Collection("column")
+	userCollection = client.Database("kanban").Collection("users")
 	taskCollection = client.Database("kanban").Collection("task")
 
-	return ctx, boardCollection, columnCollection, taskCollection
+	return ctx, boardCollection, userCollection, taskCollection
 }

@@ -17,7 +17,7 @@ type Board struct {
 	// required: true
 	//
 	// example: My Board
-	Name string `json:"name" bson:"name"`
+	Name string `json:"name" bson:"name" validate:"required, min=2, max=20"`
 	// Color of the board
 	//
 	// required: true
