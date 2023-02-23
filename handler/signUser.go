@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	helpers "kanban-task/helper"
 	"kanban-task/model"
 	"net/http"
@@ -106,7 +107,22 @@ func (handler *AuthHandler) Logout(c *gin.Context) {
 			"message": "The token is required",
 		})
 	}
+	user, _ := c.Get("user")
+	fmt.Println(user.(*helpers.Claims).Username)
+	expireTime := user.(*helpers.Claims).StandardClaims.ExpiresAt
 
 	reqToken := strings.Split(token, "Bearer ")[1]
-	handler.redisClient.Set(reqToken, "Invalid", 0)
+	secs := time.Duration(expireTime) * time.Second
+	err = handler.redisClient.Set(reqToken, "Invalid", secs).Err()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Unabale to logout at the moment",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User logged out",
+	})
 }

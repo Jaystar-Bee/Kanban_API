@@ -1,7 +1,6 @@
 package auths
 
 import (
-	"fmt"
 	helpers "kanban-task/helper"
 	"net/http"
 	"strings"
@@ -19,14 +18,13 @@ func AuthMiddleware(redisClient *redis.Client) gin.HandlerFunc {
 			})
 		}
 		reqToken := strings.Split(token, "Bearer ")[1]
-		val, err := redisClient.Get("reqToken").Result()
-
-		if val != "" {
+		val, _ := redisClient.Get(reqToken).Result()
+		if val == "Invalid" {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"message": "An Invalid token",
 			})
+			c.Abort()
 		}
-
 		tokenString, claims, err := helpers.ValidateToken(reqToken)
 
 		if err != nil || !tokenString.Valid || tokenString == nil {
@@ -36,7 +34,6 @@ func AuthMiddleware(redisClient *redis.Client) gin.HandlerFunc {
 			return
 		}
 		c.Set("user", claims)
-		fmt.Println(claims)
 		c.Next()
 	}
 }

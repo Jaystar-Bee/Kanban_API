@@ -57,7 +57,7 @@ func init() {
 	redisClient = initializer.RedisConnect()
 	boardHandler = handlers.NewBoardHandler(ctx, boardCollection, taskCollection, redisClient)
 	columnHandler = handlers.NewColumnHandler(ctx, boardCollection, redisClient)
-	authHandler = handlers.NewAuthHandler(ctx, userCollection)
+	authHandler = handlers.NewAuthHandler(ctx, userCollection, redisClient)
 	taskHandler = handlers.NewTaskHandler(ctx, taskCollection, redisClient)
 }
 
@@ -69,6 +69,7 @@ func main() {
 	userRoute.POST("/signin", authHandler.SignIn)
 
 	initRoute.Use(auths.AuthMiddleware(redisClient))
+	initRoute.POST("/users/logout", authHandler.Logout)
 	boardRoute := initRoute.Group("/boards")
 	boardRoute.GET("/", boardHandler.ListBoardHandler)
 	boardRoute.POST("/", boardHandler.InsertBoardHandler)
