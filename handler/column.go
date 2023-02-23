@@ -34,12 +34,14 @@ func (handler *ColumnHandler) ListColumnHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 	err = handler.boardCollection.FindOne(handler.ctx, bson.D{{"_id", boardID}}).Decode(&board)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 	// var columns []model.Column
 	// columns = board.Columns

@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	helpers "kanban-task/helper"
 	"kanban-task/model"
 
 	"github.com/gin-gonic/gin"
@@ -50,7 +51,13 @@ func NewBoardHandler(
 
 func (handler *BoardHandler) ListBoardHandler(c *gin.Context) {
 	var boards []model.Board
-	cursor, err := handler.boardCollection.Find(handler.ctx, bson.D{})
+	user, exist := c.Get("user")
+	if !exist {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+		return
+	}
+	var userID = user.(*helpers.Claims).UserID
+	cursor, err := handler.boardCollection.Find(handler.ctx, bson.M{"user_id": userID})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -68,7 +75,12 @@ func (handler *BoardHandler) InsertBoardHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	board.UserID = "UI5f9f1b9c1c9d440000a1e1f1"
+	user, exist := c.Get("user")
+	if !exist {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+		return
+	}
+	board.UserID = user.(*helpers.Claims).UserID
 	board.ID = primitive.NewObjectID()
 	var columns []model.Column
 
@@ -91,7 +103,17 @@ func (handler *BoardHandler) GetBoard(c *gin.Context) {
 	var id = c.Param("id")
 	objectID, _ := primitive.ObjectIDFromHex(id)
 	var board model.Board
-	err := handler.boardCollection.FindOne(handler.ctx, bson.M{"_id": objectID}).Decode(&board)
+
+	// getting user ID from the header
+	user, exist := c.Get("user")
+	if !exist {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+		return
+	}
+	userID := user.(*helpers.Claims).UserID
+
+	// getting board from the database
+	err := handler.boardCollection.FindOne(handler.ctx, bson.M{"_id": objectID, "user_id": userID}).Decode(&board)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -103,7 +125,16 @@ func (handler *BoardHandler) DeleteBoard(c *gin.Context) {
 	var id = c.Param("id")
 	objectID, _ := primitive.ObjectIDFromHex(id)
 
-	board, err := handler.boardCollection.DeleteOne(handler.ctx, bson.M{"_id": objectID})
+	// getting user ID from the header
+	user, exist := c.Get("user")
+	if !exist {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+		return
+	}
+	userID := user.(*helpers.Claims).UserID
+
+	// deleting board from the database
+	board, err := handler.boardCollection.DeleteOne(handler.ctx, bson.M{"_id": objectID, "user_id": userID})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -131,6 +162,7 @@ func (handler *BoardHandler) UpdateBoard(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 
 	var columns []model.Column

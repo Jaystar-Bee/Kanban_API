@@ -121,7 +121,6 @@ func (handler *AuthHandler) Logout(c *gin.Context) {
 		})
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"message": "User logged out",
 	})

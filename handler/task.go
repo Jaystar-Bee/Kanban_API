@@ -33,11 +33,29 @@ func NewTaskHandler(ctx context.Context,
 
 func (handler *TaskHandler) ListTaskHandler(c *gin.Context) {
 	var tasks []model.Task
-	cursor, err := handler.collection.Find(handler.ctx, bson.M{})
+	// Get board ID
+	boardID, err := helpers.ToPrimitive(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
+		return
+	}
+	// getting user ID from the header
+	user, exist := c.Get("user")
+	if !exist {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+		return
+	}
+	userID := user.(*helpers.Claims).UserID
+
+	// Get all tasks
+	cursor, err := handler.collection.Find(handler.ctx, bson.M{"user_id": userID, "board_id": boardID})
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
 	}
 
 	err = cursor.All(handler.ctx, &tasks)
@@ -45,6 +63,7 @@ func (handler *TaskHandler) ListTaskHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 	c.JSON(http.StatusOK, tasks)
 
@@ -69,7 +88,13 @@ func (handler *TaskHandler) InsertTaskHandler(c *gin.Context) {
 		return
 	}
 	task.BoardID = boardID
-	task.UserID = c.Param("id")
+	// getting user ID from the header
+	user, exist := c.Get("user")
+	if !exist {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+		return
+	}
+	task.UserID = user.(*helpers.Claims).UserID
 	task.ID = primitive.NewObjectID()
 	// Give subTask ID
 	var subTasks []model.SubTask
@@ -80,11 +105,14 @@ func (handler *TaskHandler) InsertTaskHandler(c *gin.Context) {
 		subTasks = append(subTasks, subTask)
 	}
 	task.SubTasks = subTasks
+
+	// Insert Task
 	result, err := handler.collection.InsertOne(handler.ctx, task)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": result,
@@ -101,12 +129,23 @@ func (handler *TaskHandler) GetTaskHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
-	err = handler.collection.FindOne(handler.ctx, bson.M{"_id": taskID}).Decode(&task)
+	// getting user ID from the header
+	user, exist := c.Get("user")
+	if !exist {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+		return
+	}
+	userID := user.(*helpers.Claims).UserID
+
+	// Get Task
+	err = handler.collection.FindOne(handler.ctx, bson.M{"_id": taskID, "user_id": userID}).Decode(&task)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 	c.JSON(http.StatusOK, task)
 }
@@ -119,12 +158,23 @@ func (handler *TaskHandler) DeleteTaskHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
-	result, err := handler.collection.DeleteOne(handler.ctx, bson.M{"_id": taskID})
+	// getting user ID from the header
+	user, exist := c.Get("user")
+	if !exist {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+		return
+	}
+	userID := user.(*helpers.Claims).UserID
+
+	// Delete Task
+	result, err := handler.collection.DeleteOne(handler.ctx, bson.M{"_id": taskID, "user_id": userID})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 	c.JSON(http.StatusOK, result)
 }
@@ -138,12 +188,14 @@ func (handler *TaskHandler) UpdateTaskHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 	err = c.ShouldBindJSON(&task)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 	var subTasks []model.SubTask
 	for _, subTask := range task.SubTasks {
@@ -168,6 +220,7 @@ func (handler *TaskHandler) UpdateTaskHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": result,

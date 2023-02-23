@@ -24,7 +24,7 @@ type OutputToken struct {
 
 func GenerateToken(user model.User) (*OutputToken, error) {
 
-	expireTime := time.Now().Add(time.Hour * 48)
+	expireTime := time.Now().Add(time.Hour * 5)
 	claims := &Claims{
 		Username:  user.Username,
 		UserID:    user.UserID,

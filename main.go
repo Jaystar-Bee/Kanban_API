@@ -78,12 +78,12 @@ func main() {
 	boardRoute.PUT("/:id", boardHandler.UpdateBoard)
 
 	columnRoute := initRoute.Group("/columns")
-	columnRoute.GET("/:id", columnHandler.ListColumnHandler)
+	columnRoute.GET("/:id", columnHandler.ListColumnHandler) // board id
 
 	taskRoute := initRoute.Group("/tasks")
-	taskRoute.GET("/", taskHandler.ListTaskHandler)
+	taskRoute.GET("/:id", taskHandler.ListTaskHandler) // board id
 	taskRoute.POST("/:id", taskHandler.InsertTaskHandler)
-	taskRoute.GET("/:id", taskHandler.GetTaskHandler)
+	taskRoute.GET("/task/:id", taskHandler.GetTaskHandler)
 	taskRoute.DELETE("/:id", taskHandler.DeleteTaskHandler)
 	taskRoute.PUT("/:id", taskHandler.UpdateTaskHandler)
 
