@@ -37,16 +37,25 @@ func NewBoardHandler(
 	}
 }
 
-//swagger:route GET /boards Boards GetAllBoards
+// swagger:route GET /boards Boards GetAllBoards
 //
 // This route get all the boards created by the user
 //
-// Produces
+// Get all the boards for the user
+//
+// Produces:
 // -application/json
 //
+// Parameters:
+// + name: Authorization
+//   in: header
+//   description: "Authorization token"
+//   required: true
+//   type: string
+//
 // Responses:
-//	200: BoardReply
-//	500: ErrorReply
+// 200: BoardReply
+// 500: ErrorResponse
 //
 
 func (handler *BoardHandler) ListBoardHandler(c *gin.Context) {
@@ -68,6 +77,39 @@ func (handler *BoardHandler) ListBoardHandler(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, boards)
 }
+
+// swagger:route POST /boards Boards InsertNewBoard
+//
+// Insert new Board to the user boards
+//
+// User to input a brand new board
+//
+// Consumes:
+// -application/json
+//
+// Produces:
+//  -application/json
+//
+// Schemes: http, https
+//
+// Parameters:
+// + name: board
+//   in: body
+//   description: "Board object that needs to be added to the user"
+//   required: true
+//   schema: "$ref": "#/definitions/BoardRequest"
+//   type: BoardRequest
+//
+// + name: Authorization
+//   in: header
+//   description: "Authorization token"
+//   required: true
+//   type: string
+//
+// Responses:
+// 200: BoardReply
+// 404: ErrorResponse
+// 500: ErrorResponse
 
 func (handler *BoardHandler) InsertBoardHandler(c *gin.Context) {
 	var board model.Board
@@ -98,6 +140,33 @@ func (handler *BoardHandler) InsertBoardHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, board)
 }
 
+// swagger:route GET /boards/{id} Boards GetBoard
+//
+// Get a board by ID
+//
+// Get a board by ID
+//
+// Produces:
+// -application/json
+//
+// Parameters:
+// + name: id
+//   in: path
+//   description: "ID of the board to be fetched"
+//   required: true
+//   type: string
+//
+// + name: Authorization
+//   in: header
+//   description: "Authorization token"
+//   required: true
+//   type: string
+//
+// Responses:
+// 200: BoardReply
+// 404: ErrorResponse
+// 500: ErrorResponse
+
 func (handler *BoardHandler) GetBoard(c *gin.Context) {
 
 	var id = c.Param("id")
@@ -107,7 +176,7 @@ func (handler *BoardHandler) GetBoard(c *gin.Context) {
 	// getting user ID from the header
 	user, exist := c.Get("user")
 	if !exist {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 	userID := user.(*helpers.Claims).UserID
@@ -120,6 +189,33 @@ func (handler *BoardHandler) GetBoard(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, board)
 }
+
+// swagger:route PUT /boards/{id} Boards DeleteBoard
+//
+// Delete a board by ID
+// 
+// Delete a board by ID
+//
+// Produces:
+// -application/json
+//
+// Parameters:
+// + name: id
+//   in: path
+//   description: "ID of the board to be deleted"
+//   required: true
+//   type: string
+//
+// + name: Authorization
+//   in: header
+//   description: "Authorization token"
+//   required: true
+//   type: string
+//
+// Responses:
+// 200: BoardReply
+// 404: ErrorResponse
+// 500: ErrorResponse
 
 func (handler *BoardHandler) DeleteBoard(c *gin.Context) {
 	var id = c.Param("id")
@@ -152,6 +248,45 @@ func (handler *BoardHandler) DeleteBoard(c *gin.Context) {
 	})
 
 }
+
+// swagger:route PUT /boards/{id} Boards UpdateBoard
+//
+// Update a board by ID
+//
+// Update a board by ID
+//
+// Consumes:
+// -application/json
+//
+// Produces:
+// -application/json
+//
+// Parameters:
+// + name: id
+//   in: path
+//   description: "ID of the board to be updated"
+//   required: true
+//   type: string
+//
+// + name: Authorization
+//   in: header
+//   description: "Authorization token"
+//   required: true
+//   type: string
+//
+// + name: BoardRequest
+//   in: body
+//   description: "Board to be updated"
+//   required: true
+//   type: BoardRequest
+//   schema:
+//     "$ref": "#/definitions/BoardRequest"
+//
+// Responses:
+// 200: BoardReply
+// 400: ErrorResponse
+// 404: ErrorResponse
+// 500: ErrorResponse
 
 func (handler *BoardHandler) UpdateBoard(c *gin.Context) {
 	id := c.Param("id")

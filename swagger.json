@@ -25,24 +25,673 @@
   "paths": {
     "/boards": {
       "get": {
-        "description": "Produces\napplication/json",
+        "description": "Get all the boards for the user",
+        "produces": [
+          "application/json"
+        ],
         "tags": [
           "Boards"
         ],
         "summary": "This route get all the boards created by the user",
         "operationId": "GetAllBoards",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\"Authorization token\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "description": "\"Authorization token\"",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "$ref": "#/responses/BoardReply"
           },
-          "500": {}
+          "500": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      },
+      "post": {
+        "description": "User to input a brand new board",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "Boards"
+        ],
+        "summary": "Insert new Board to the user boards",
+        "operationId": "InsertNewBoard",
+        "parameters": [
+          {
+            "type": "object",
+            "description": "\"Board object that needs to be added to the user\"",
+            "name": "board",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "description": "\"Board object that needs to be added to the user\"",
+              "type": "object",
+              "$ref": "#/definitions/BoardRequest"
+            }
+          },
+          {
+            "type": "string",
+            "description": "\"Authorization token\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "description": "\"Authorization token\"",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/BoardReply"
+          },
+          "404": {
+            "$ref": "#/responses/ErrorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/boards/{id}": {
+      "get": {
+        "description": "Get a board by ID",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Boards"
+        ],
+        "summary": "Get a board by ID",
+        "operationId": "GetBoard",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\"ID of the board to be fetched\"",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "description": "\"ID of the board to be fetched\"",
+              "type": "string"
+            }
+          },
+          {
+            "type": "string",
+            "description": "\"Authorization token\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "description": "\"Authorization token\"",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/BoardReply"
+          },
+          "404": {
+            "$ref": "#/responses/ErrorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      },
+      "put": {
+        "description": "Update a board by ID",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Boards"
+        ],
+        "summary": "Update a board by ID",
+        "operationId": "UpdateBoard",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\"ID of the board to be updated\"",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "description": "\"ID of the board to be updated\"",
+              "type": "string"
+            }
+          },
+          {
+            "type": "string",
+            "description": "\"Authorization token\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "description": "\"Authorization token\"",
+              "type": "string"
+            }
+          },
+          {
+            "type": "object",
+            "description": "\"Board to be updated\"",
+            "name": "BoardRequest",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "description": "\"Board to be updated\"",
+              "type": "object",
+              "$ref": "#/definitions/BoardRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/BoardReply"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorResponse"
+          },
+          "404": {
+            "$ref": "#/responses/ErrorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/boards/{id}/columns": {
+      "get": {
+        "description": "Get all the columns for a board",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Columns"
+        ],
+        "summary": "This route get all the columns for a board",
+        "operationId": "ListColumn",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\"Authorization token\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "description": "\"Authorization token\"",
+              "type": "string"
+            }
+          },
+          {
+            "type": "string",
+            "description": "\"Board ID\"",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "description": "\"Board ID\"",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/ColumnReply"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "description": "Logout a user",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Auth"
+        ],
+        "summary": "This route is used to logout a user",
+        "operationId": "Logout",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\"Token of the user\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "description": "\"Token of the user\"",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/UserReply"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/signin": {
+      "post": {
+        "description": "Sign in a new user",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Auth"
+        ],
+        "summary": "This route is used to sign in a new user",
+        "operationId": "SignIn",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\"Username of the user\"",
+            "name": "username",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "description": "\"Username of the user\"",
+              "type": "string"
+            }
+          },
+          {
+            "type": "string",
+            "description": "\"Password of the user\"",
+            "name": "password",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "description": "\"Password of the user\"",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/UserReply"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/signup": {
+      "post": {
+        "description": "Sign up a new user",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Auth"
+        ],
+        "summary": "This route is used to sign up a new user",
+        "operationId": "SignUp",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\"Username of the user\"",
+            "name": "username",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "description": "\"Username of the user\"",
+              "type": "string"
+            }
+          },
+          {
+            "type": "string",
+            "description": "\"Password of the user\"",
+            "name": "password",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "description": "\"Password of the user\"",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/UserReply"
+          },
+          "400": {
+            "$ref": "#/responses/ErrorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/tasks": {
+      "get": {
+        "description": "Get all the tasks for the user",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "This route get all the tasks created by the user",
+        "operationId": "GetAllTasks",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\"Authorization token\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "description": "\"Authorization token\"",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/TaskReply"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/tasks/:id": {
+      "get": {
+        "description": "Get a task",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "This route get a task",
+        "operationId": "GetTask",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\"Authorization token\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "description": "\"Authorization token\"",
+              "type": "string"
+            }
+          },
+          {
+            "type": "string",
+            "description": "\"Task ID\"",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "description": "\"Task ID\"",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/TaskReply"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      },
+      "put": {
+        "description": "Update a task",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "This route update a task",
+        "operationId": "UpdateTask",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\"Authorization token\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "description": "\"Authorization token\"",
+              "type": "string"
+            }
+          },
+          {
+            "type": "string",
+            "description": "\"Task ID\"",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "description": "\"Task ID\"",
+              "type": "string"
+            }
+          },
+          {
+            "type": "object",
+            "description": "\"Task\"",
+            "name": "task",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "description": "\"Task\"",
+              "type": "object",
+              "$ref": "#/definitions/TaskRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/TaskReply"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      },
+      "post": {
+        "description": "Create a task",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "This route create a task",
+        "operationId": "CreateTask",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\"Authorization token\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "description": "\"Authorization token\"",
+              "type": "string"
+            }
+          },
+          {
+            "type": "string",
+            "description": "\"Board ID\"",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "description": "\"Board ID\"",
+              "type": "string"
+            }
+          },
+          {
+            "type": "object",
+            "description": "\"Task to be created\"",
+            "name": "task",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "description": "\"Task to be created\"",
+              "type": "object",
+              "$ref": "#/definitions/TaskRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/TaskReply"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a task",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "This route delete a task",
+        "operationId": "DeleteTask",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\"Authorization token\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "description": "\"Authorization token\"",
+              "type": "string"
+            }
+          },
+          {
+            "type": "string",
+            "description": "\"Task ID\"",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "description": "\"Task ID\"",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/TaskReply"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/tasks/:status": {
+      "delete": {
+        "description": "Delete the task with the specified status",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "This route delete task with a particular status",
+        "operationId": "DeleteTask",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\"Authorization token\"",
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "description": "\"Authorization token\"",
+              "type": "string"
+            }
+          },
+          {
+            "type": "string",
+            "description": "\"Task status\"",
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "description": "\"Task status\"",
+              "type": "string"
+            }
+          },
+          {
+            "type": "string",
+            "description": "\"User Id\"",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "description": "\"User Id\"",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/TaskReply"
+          },
+          "500": {
+            "$ref": "#/responses/ErrorResponse"
+          }
         }
       }
     }
   },
   "definitions": {
     "Board": {
-      "description": "Board is the model for board",
       "type": "object",
       "required": [
         "id",
@@ -50,20 +699,113 @@
         "user_id"
       ],
       "properties": {
+        "columns": {
+          "description": "Columns for the board",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Column"
+          },
+          "x-go-name": "Columns",
+          "x-property-array": [
+            "value1",
+            "value2"
+          ],
+          "x-property-object": {
+            "key1": "value1",
+            "key2": "value2"
+          },
+          "x-property-value": "value"
+        },
         "id": {
           "$ref": "#/definitions/ObjectID"
         },
         "name": {
-          "description": "Name of the board",
+          "description": "The name for the board",
           "type": "string",
           "x-go-name": "Name",
           "example": "My Board"
         },
         "user_id": {
-          "description": "User ID of the board",
+          "description": "The user id for the board",
           "type": "string",
           "x-go-name": "UserID",
-          "example": "5e4d3b5b6b6b6b6b6b6b6b6b"
+          "example": "5f1f9b9e0f1c9c0001e1b1b1"
+        }
+      },
+      "x-go-package": "kanban-task/model"
+    },
+    "BoardRequest": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "columns": {
+          "description": "Columns for the board",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Column"
+          },
+          "x-go-name": "Columns",
+          "x-property-array": [
+            "value1",
+            "value2"
+          ],
+          "x-property-object": {
+            "key1": "value1",
+            "key2": "value2"
+          },
+          "x-property-value": "value"
+        },
+        "name": {
+          "description": "The name for the board",
+          "type": "string",
+          "x-go-name": "Name",
+          "example": "My Board"
+        }
+      },
+      "x-go-package": "kanban-task/model"
+    },
+    "Column": {
+      "type": "object",
+      "properties": {
+        "color": {
+          "type": "string",
+          "x-go-name": "Color"
+        },
+        "id": {
+          "$ref": "#/definitions/ObjectID"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        }
+      },
+      "x-go-package": "kanban-task/model"
+    },
+    "ExposedUser": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "ExpiresAt"
+        },
+        "id": {
+          "$ref": "#/definitions/ObjectID"
+        },
+        "user_id": {
+          "type": "string",
+          "x-go-name": "UserID"
+        },
+        "username": {
+          "type": "string",
+          "x-go-name": "Username"
         }
       },
       "x-go-package": "kanban-task/model"
@@ -76,13 +818,126 @@
         "format": "uint8"
       },
       "x-go-package": "go.mongodb.org/mongo-driver/bson/primitive"
+    },
+    "SubTask": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/ObjectID"
+        },
+        "is_done": {
+          "type": "boolean",
+          "x-go-name": "IsDone"
+        },
+        "title": {
+          "type": "string",
+          "x-go-name": "Title"
+        }
+      },
+      "x-go-package": "kanban-task/model"
+    },
+    "Task": {
+      "type": "object",
+      "properties": {
+        "board_id": {
+          "$ref": "#/definitions/ObjectID"
+        },
+        "description": {
+          "type": "string",
+          "x-go-name": "Description"
+        },
+        "id": {
+          "$ref": "#/definitions/ObjectID"
+        },
+        "status": {
+          "type": "string",
+          "x-go-name": "Status"
+        },
+        "sub_tasks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SubTask"
+          },
+          "x-go-name": "SubTasks"
+        },
+        "title": {
+          "type": "string",
+          "x-go-name": "Title"
+        },
+        "user_id": {
+          "type": "string",
+          "x-go-name": "UserID"
+        }
+      },
+      "x-go-package": "kanban-task/model"
+    },
+    "TaskRequest": {
+      "type": "object",
+      "required": [
+        "title",
+        "description",
+        "status",
+        "sub_tasks"
+      ],
+      "properties": {
+        "description": {
+          "description": "The description for the task",
+          "type": "string",
+          "x-go-name": "Description",
+          "example": "My Task Description"
+        },
+        "status": {
+          "description": "The status for the task",
+          "type": "string",
+          "x-go-name": "Status",
+          "example": "TODO"
+        },
+        "sub_tasks": {
+          "description": "The sub tasks for the task",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SubTask"
+          },
+          "x-go-name": "SubTasks",
+          "example": []
+        },
+        "title": {
+          "description": "The title for the task",
+          "type": "string",
+          "x-go-name": "Title",
+          "example": "My Task"
+        }
+      },
+      "x-go-package": "kanban-task/model"
     }
   },
   "responses": {
     "BoardReply": {
-      "description": "Board reply is the model for board reply",
       "schema": {
         "$ref": "#/definitions/Board"
+      }
+    },
+    "ErrorResponse": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "description": "The error message",
+            "type": "string",
+            "x-go-name": "Message",
+            "example": "Error message"
+          }
+        }
+      }
+    },
+    "TaskReply": {
+      "schema": {
+        "$ref": "#/definitions/Task"
+      }
+    },
+    "UserReply": {
+      "schema": {
+        "$ref": "#/definitions/ExposedUser"
       }
     }
   }

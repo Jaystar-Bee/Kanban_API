@@ -19,4 +19,11 @@ type ExposedUser struct {
 	Username  string             `json:"username" bson:"username" validate:"required, min=3"`
 	UserID    string             `json:"user_id" bson:"user_id"`
 	CreatedAt time.Time          `json:"created_at" bson:"created_at"`
+	ExpiresAt time.Time          `json:"expires_at" bson:"expires_at"`
+}
+
+// swagger:response
+type UserReply struct {
+	// in: body
+	Body *ExposedUser
 }

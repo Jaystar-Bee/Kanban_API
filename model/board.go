@@ -1,48 +1,78 @@
 package model
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
-// Board is the model for board
-//
-//	swagger:model
+// swagger:model
 type Board struct {
-	// ID for the user
-	//
+	// The id for the board
 	// required: true
-	//
-	// example: 5e4d3b5b6b6b6b6b6b6b6b6b
+	// example: 5f1f9b9e0f1c9c0001e1b1b1
 	ID primitive.ObjectID `json:"id" bson:"_id"`
-	// Name of the board
-	//
+	// The name for the board
 	// required: true
-	//
 	// example: My Board
 	Name string `json:"name" bson:"name" validate:"required, min=2, max=20"`
-	// Color of the board
+	// Columns for the board
 	//
-	// required: true
-	//
+	// Extensions:
+	// ---
+	// x-property-value: value
+	// x-property-array:
+	// - value1
+	// - value2
+	// x-property-object:
+	//   key1: value1
+	//   key2: value2
+	// ---
 	Columns []Column `json:"columns" bson:"columns"`
-	// User ID of the board
-	//
+	// The user id for the board
 	// required: true
-	//
-	// example: 5e4d3b5b6b6b6b6b6b6b6b6b
+	// example: 5f1f9b9e0f1c9c0001e1b1b1
 	UserID string `json:"user_id" bson:"user_id"`
 }
 
-// Board reply is the model for board reply
-//
-//	swagger:response
+// swagger:model BoardRequest
+type BoardRequest struct {
+	// The name for the board
+	// required: true
+	// example: My Board
+	Name string `json:"name" bson:"name" validate:"required, min=2, max=20"`
+	// Columns for the board
+	//
+	// Extensions:
+	// ---
+	// x-property-value: value
+	// x-property-array:
+	// - value1
+	// - value2
+	// x-property-object:
+	//   key1: value1
+	//   key2: value2
+	// ---
+	Columns []Column `json:"columns" bson:"columns"`
+}
+
+// swagger:response
 type BoardReply struct {
 	// in: body
 	Body *Board
 }
 
-//Error reply is the model for error reply
-//
-//	swagger:response
-type ErrorReply struct {
+// swagger:parameters createBoard
+type BoardParam struct {
 	// in: body
-	Body *error
+	Body *BoardRequest
+}
+
+// swagger:response
+type ErrorResponse struct {
+	// The error message
+	// in: body
+	Body struct {
+		// The error message
+		// example: Error message
+		Message string `json:"message"`
+	}
 }

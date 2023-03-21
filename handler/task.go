@@ -31,6 +31,26 @@ func NewTaskHandler(ctx context.Context,
 
 //Get All Tasks
 
+// swagger:route GET /tasks Tasks GetAllTasks
+//
+// This route get all the tasks created by the user
+//
+// Get all the tasks for the user
+//
+// Produces:
+// -application/json
+//
+// Parameters:
+// + name: Authorization
+//   in: header
+//   description: "Authorization token"
+//   required: true
+//   type: string
+//
+// Responses:
+// 200: TaskReply
+// 500: ErrorResponse
+
 func (handler *TaskHandler) ListTaskHandler(c *gin.Context) {
 	var tasks []model.Task
 	// Get board ID
@@ -70,6 +90,38 @@ func (handler *TaskHandler) ListTaskHandler(c *gin.Context) {
 }
 
 // Create a Task
+
+// swagger:route POST /tasks/:id Tasks CreateTask
+//
+// This route create a task
+//
+// Create a task
+//
+// Produces:
+// -application/json
+//
+// Parameters:
+// + name: Authorization
+//   in: header
+//   description: "Authorization token"
+//   required: true
+//   type: string
+// + name: id
+//   in: path
+//   description: "Board ID"
+//   required: true
+//   type: string
+// + name: task
+//   in: body
+//   description: "Task to be created"
+//   required: true
+//   type: TaskRequest
+//   schema:
+//     "$ref": "#/definitions/TaskRequest"
+//
+// Responses:
+// 200: TaskReply
+// 500: ErrorResponse
 
 func (handler *TaskHandler) InsertTaskHandler(c *gin.Context) {
 	boardID, err := helpers.ToPrimitive(c.Param("id"))
@@ -122,6 +174,31 @@ func (handler *TaskHandler) InsertTaskHandler(c *gin.Context) {
 
 // Get A Task
 
+// swagger:route GET /tasks/:id Tasks GetTask
+//
+// This route get a task
+//
+// Get a task
+//
+// Produces:
+// -application/json
+//
+// Parameters:
+// + name: Authorization
+//   in: header
+//   description: "Authorization token"
+//   required: true
+//   type: string
+// + name: id
+//   in: path
+//   description: "Task ID"
+//   required: true
+//   type: string
+//
+// Responses:
+// 200: TaskReply
+// 500: ErrorResponse
+
 func (handler *TaskHandler) GetTaskHandler(c *gin.Context) {
 	var task model.Task
 	taskID, err := helpers.ToPrimitive(c.Param("id"))
@@ -152,6 +229,31 @@ func (handler *TaskHandler) GetTaskHandler(c *gin.Context) {
 
 //Delete Task
 
+// swagger:route DELETE /tasks/:id Tasks DeleteTask
+//
+// This route delete a task
+//
+// Delete a task
+//
+// Produces:
+// -application/json
+//
+// Parameters:
+// + name: Authorization
+//   in: header
+//   description: "Authorization token"
+//   required: true
+//   type: string
+// + name: id
+//   in: path
+//   description: "Task ID"
+//   required: true
+//   type: string
+//
+// Responses:
+// 200: TaskReply
+// 500: ErrorResponse
+
 func (handler *TaskHandler) DeleteTaskHandler(c *gin.Context) {
 	taskID, err := helpers.ToPrimitive(c.Param("id"))
 	if err != nil {
@@ -180,6 +282,38 @@ func (handler *TaskHandler) DeleteTaskHandler(c *gin.Context) {
 }
 
 // Update a Task
+
+// swagger:route PUT /tasks/:id Tasks UpdateTask
+//
+// This route update a task
+//
+// Update a task
+//
+// Produces:
+// -application/json
+//
+// Parameters:
+// + name: Authorization
+//   in: header
+//   description: "Authorization token"
+//   required: true
+//   type: string
+// + name: id
+//   in: path
+//   description: "Task ID"
+//   required: true
+//   type: string
+// + name: task
+//   in: body
+//   description: "Task"
+//   required: true
+//   type: TaskRequest
+//   schema:
+//     "$ref": "#/definitions/TaskRequest"
+//
+// Responses:
+// 200: TaskReply
+// 500: ErrorResponse
 
 func (handler *TaskHandler) UpdateTaskHandler(c *gin.Context) {
 	var task model.Task
@@ -226,4 +360,60 @@ func (handler *TaskHandler) UpdateTaskHandler(c *gin.Context) {
 		"message": result,
 		"task":    task,
 	})
+}
+
+//Delete Task By Status
+
+// swagger:route DELETE /tasks/:status Tasks DeleteTask
+//
+// This route delete task with a particular status
+//
+// Delete the task with the specified status
+//
+// Produces:
+// -application/json
+//
+// Parameters:
+// + name: Authorization
+//   in: header
+//   description: "Authorization token"
+//   required: true
+//   type: string
+// + name: status
+//   in: path
+//   description: "Task status"
+//   required: true
+//   type: string
+// + name: id
+//   in: path
+//   description: "User Id"
+//   required: true
+//   type: string
+//
+// Responses:
+// 200: TaskReply
+// 500: ErrorResponse
+
+func (handler *TaskHandler) DeleteTasksByStatus(c *gin.Context) {
+	status := c.Param("status")
+
+	// getting user ID from the header
+	user, exist := c.Get("user")
+	if !exist {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+		return
+	}
+	userID := user.(*helpers.Claims).UserID
+
+	result, err := handler.collection.DeleteMany(handler.ctx, bson.M{"status": status, "user_id": userID})
+
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
+
 }

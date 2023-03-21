@@ -27,6 +27,32 @@ func NewColumnHandler(ctx context.Context, boardCollection *mongo.Collection, re
 }
 
 // List all Columns
+
+// swagger:route GET /boards/{id}/columns Columns ListColumn
+//
+// This route get all the columns for a board
+//
+// Get all the columns for a board
+//
+// Produces:
+// -application/json
+//
+// Parameters:
+// + name: Authorization
+//   in: header
+//   description: "Authorization token"
+//   required: true
+//   type: string
+// + name: id
+//   in: path
+//   description: "Board ID"
+//   required: true
+//   type: string
+//
+// Responses:
+// 200: ColumnReply
+// 500: ErrorResponse
+
 func (handler *ColumnHandler) ListColumnHandler(c *gin.Context) {
 	var board model.Board
 	boardID, err := helpers.ToPrimitive(c.Param("id"))
@@ -43,104 +69,5 @@ func (handler *ColumnHandler) ListColumnHandler(c *gin.Context) {
 		})
 		return
 	}
-	// var columns []model.Column
-	// columns = board.Columns
-	// fmt.Println(columns)
 	c.JSON(http.StatusOK, board.Columns)
 }
-
-// Create Column
-
-// func (handler *ColumnHandler) InsertColumnHandler(c *gin.Context) {
-// 	var column model.Column
-// 	boardID, err := primitive.ObjectIDFromHex(c.Param("id"))
-// 	err = c.ShouldBind(&column)
-
-// 	if err != nil {
-// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-// 			"message": err.Error(),
-// 		})
-// 	}
-// 	result, err := handler.columnCollection.InsertOne(handler.ctx, column)
-// 	if err != nil {
-// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-// 			"message": err.Error(),
-// 		})
-// 	}
-// 	column.ID = primitive.NewObjectID()
-// 	column.BoardID = boardID
-// 	column.UserID = "UI5f9f1b9c1c9d440000a1e1f1"
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"message": result,
-// 		"column":  column,
-// 	})
-// }
-
-// Delete Column
-
-// func (handler *ColumnHandler) DeleteColumnHandler(c *gin.Context) {
-// 	columnID, err := helpers.ToPrimitive(c.Param("id"))
-// 	// columnID, err := primitive.ObjectIDFromHex(c.Param("id"))
-// 	if err != nil {
-// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-// 			"message": err.Error(),
-// 		})
-// 	}
-// 	res, err := handler.columnCollection.DeleteOne(handler.ctx, bson.M{"_id": columnID})
-// 	if err != nil {
-// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-// 			"message": err.Error(),
-// 		})
-// 	}
-// 	c.JSON(http.StatusOK, res)
-// }
-
-// GET a Column
-
-// func (handler *ColumnHandler) GetColumnHandler(c *gin.Context) {
-// 	columnID, err := helpers.ToPrimitive(c.Param("id"))
-// 	if err != nil {
-// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-// 			"message": err.Error(),
-// 		})
-// 	}
-// 	var column model.Column
-// 	err = handler.columnCollection.FindOne(handler.ctx, bson.M{"_id": columnID}).Decode(&column)
-// 	if err != nil {
-// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-// 			"message": err.Error(),
-// 		})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, column)
-
-// }
-
-// Edit a column
-
-// func (handler *ColumnHandler) UpdateColumnHandler(c *gin.Context) {
-// 	columnID, err := helpers.ToPrimitive(c.Param("id"))
-// 	var column model.Column
-// 	err = c.ShouldBindJSON(&column)
-// 	if err != nil {
-// 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-// 			"message": err.Error(),
-// 		})
-// 	}
-// 	element := bson.D{{"_id", columnID}}
-// 	filter := bson.D{{"$set", bson.D{
-// 		{"name", column.Name},
-// 		{"color", column.Color},
-// 	}}}
-
-// 	update, err := handler.columnCollection.UpdateOne(handler.ctx, element, filter)
-// 	if err != nil {
-// 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-// 			"message": err.Error(),
-// 		})
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"result": update,
-// 		"column": column,
-// 	})
-// }

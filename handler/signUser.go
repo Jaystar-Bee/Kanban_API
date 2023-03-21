@@ -30,6 +30,32 @@ func NewAuthHandler(ctx context.Context, collection *mongo.Collection, redisClie
 
 }
 
+// swagger:route POST /signup Auth SignUp
+//
+// This route is used to sign up a new user
+//
+// Sign up a new user
+//
+// Produces:
+// -application/json
+//
+// Parameters:
+// + name: username
+//   in: body
+//   description: "Username of the user"
+//   required: true
+//   type: string
+// + name: password
+//   in: body
+//   description: "Password of the user"
+//   required: true
+//   type: string
+//
+// Responses:
+// 200: UserReply
+// 400: ErrorResponse
+// 500: ErrorResponse
+
 func (handler *AuthHandler) SignUp(c *gin.Context) {
 	var user model.User
 	err := c.ShouldBindJSON(&user)
@@ -71,6 +97,32 @@ func (handler *AuthHandler) SignUp(c *gin.Context) {
 
 }
 
+// swagger:route POST /signin Auth SignIn
+//
+// This route is used to sign in a new user
+//
+// Sign in a new user
+//
+// Produces:
+// -application/json
+//
+// Parameters:
+// + name: username
+//   in: body
+//   description: "Username of the user"
+//   required: true
+//   type: string
+// + name: password
+//   in: body
+//   description: "Password of the user"
+//   required: true
+//   type: string
+//
+// Responses:
+// 200: UserReply
+// 400: ErrorResponse
+// 500: ErrorResponse
+
 func (handler *AuthHandler) SignIn(c *gin.Context) {
 	var user model.User
 
@@ -99,6 +151,27 @@ func (handler *AuthHandler) SignIn(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, userResult)
 }
+
+// swagger:route POST /logout Auth Logout
+//
+// This route is used to logout a user
+//
+// Logout a user
+//
+// Produces:
+// -application/json
+//
+// Parameters:
+// + name: Authorization
+//   in: header
+//   description: "Token of the user"
+//   required: true
+//   type: string
+//
+// Responses:
+// 200: UserReply
+// 400: ErrorResponse
+// 500: ErrorResponse
 
 func (handler *AuthHandler) Logout(c *gin.Context) {
 	token := c.GetHeader("Authorization")

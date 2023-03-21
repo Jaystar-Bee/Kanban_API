@@ -23,11 +23,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"kanban-task/auths"
 	handlers "kanban-task/handler"
 	initializer "kanban-task/initial"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 	"github.com/joho/godotenv"
@@ -63,6 +65,16 @@ func init() {
 
 func main() {
 	router := gin.Default()
+
+	router.Use(cors.New(
+		cors.Config{
+			AllowOrigins: []string{"http://127.0.0.1:5173", "http://localhost:5173", "http://kanbantask.netlify.app", "https://kanbantask.netlify.app"},
+			AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
+			AllowHeaders: []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods", "Access-Control-Allow-Credentials", "Access-Control-Max-Age"},
+
+			MaxAge: 12 * time.Hour,
+		}))
+
 	initRoute := router.Group("/api/v1")
 	userRoute := initRoute.Group("/users")
 	userRoute.POST("/signup", authHandler.SignUp)
@@ -79,6 +91,7 @@ func main() {
 
 	columnRoute := initRoute.Group("/columns")
 	columnRoute.GET("/:id", columnHandler.ListColumnHandler) // board id
+	columnRoute.DELETE("/:status", taskHandler.DeleteTasksByStatus)
 
 	taskRoute := initRoute.Group("/tasks")
 	taskRoute.GET("/:id", taskHandler.ListTaskHandler) // board id
