@@ -18,13 +18,15 @@ import (
 type AuthHandler struct {
 	ctx         context.Context
 	collection  *mongo.Collection
+	expires     *mongo.Collection
 	redisClient *redis.Client
 }
 
-func NewAuthHandler(ctx context.Context, collection *mongo.Collection, redisClient *redis.Client) *AuthHandler {
+func NewAuthHandler(ctx context.Context, collection *mongo.Collection, expires *mongo.Collection, redisClient *redis.Client) *AuthHandler {
 	return &AuthHandler{
 		ctx:         ctx,
 		collection:  collection,
+		expires:     expires,
 		redisClient: redisClient,
 	}
 
@@ -194,7 +196,17 @@ func (handler *AuthHandler) Logout(c *gin.Context) {
 		})
 		return
 	}
+	res, err := handler.expires.InsertOne(handler.ctx, reqToken)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Unabale to logout at the moment",
+			"error":   err.Error(),
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "User logged out",
+		"data":    res,
 	})
 }

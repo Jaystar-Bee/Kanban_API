@@ -37,16 +37,17 @@ import (
 )
 
 var (
-	PORT            = ":3000"
-	boardCollection *mongo.Collection
-	userCollection  *mongo.Collection
-	taskCollection  *mongo.Collection
-	ctx             context.Context
-	redisClient     *redis.Client
-	boardHandler    *handlers.BoardHandler
-	columnHandler   *handlers.ColumnHandler
-	authHandler     *handlers.AuthHandler
-	taskHandler     *handlers.TaskHandler
+	PORT              = ":3000"
+	boardCollection   *mongo.Collection
+	userCollection    *mongo.Collection
+	expiresCollection *mongo.Collection
+	taskCollection    *mongo.Collection
+	ctx               context.Context
+	redisClient       *redis.Client
+	boardHandler      *handlers.BoardHandler
+	columnHandler     *handlers.ColumnHandler
+	authHandler       *handlers.AuthHandler
+	taskHandler       *handlers.TaskHandler
 )
 
 func init() {
@@ -55,11 +56,11 @@ func init() {
 		log.Fatal("Unable to load .env")
 	}
 
-	ctx, boardCollection, userCollection, taskCollection = initializer.MongoConnect()
+	ctx, boardCollection, userCollection, taskCollection, expiresCollection = initializer.MongoConnect()
 	redisClient = initializer.RedisConnect()
 	boardHandler = handlers.NewBoardHandler(ctx, boardCollection, taskCollection, redisClient)
 	columnHandler = handlers.NewColumnHandler(ctx, boardCollection, redisClient)
-	authHandler = handlers.NewAuthHandler(ctx, userCollection, redisClient)
+	authHandler = handlers.NewAuthHandler(ctx, userCollection, expiresCollection, redisClient)
 	taskHandler = handlers.NewTaskHandler(ctx, taskCollection, redisClient)
 }
 
