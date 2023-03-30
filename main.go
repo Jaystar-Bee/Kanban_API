@@ -19,10 +19,10 @@
 //	swagger:meta
 package main
 
+// "log"
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"kanban-task/auths"
@@ -32,9 +32,10 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
-	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 )
+
+// "github.com/joho/godotenv"
 
 var (
 	PORT              = ":3000"
