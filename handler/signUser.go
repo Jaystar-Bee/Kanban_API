@@ -196,17 +196,17 @@ func (handler *AuthHandler) Logout(c *gin.Context) {
 		})
 		return
 	}
-	res, err := handler.expires.InsertOne(handler.ctx, reqToken)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": "Unabale to logout at the moment",
-			"error":   err.Error(),
-		})
-		return
-	}
+	// res, err := handler.expires.InsertOne(handler.ctx, reqToken)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+	// 		"message": "Unabale to logout at the moment",
+	// 		"error":   err.Error(),
+	// 	})
+	// 	return
+	// }
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "User logged out",
-		"data":    res,
+		// "data":    res,
 	})
 }
