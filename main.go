@@ -51,10 +51,10 @@ var (
 )
 
 func init() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Println("Unable to load .env file")
-	}
+	// err := godotenv.Load(".env")
+	// if err != nil {
+	// 	log.Println("Unable to load .env file")
+	// }
 
 	ctx, boardCollection, userCollection, taskCollection, expiresCollection = initializer.MongoConnect()
 	redisClient = initializer.RedisConnect()
