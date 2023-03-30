@@ -53,7 +53,7 @@ var (
 func init() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Unable to load .env")
+		log.Println("Unable to load .env file")
 	}
 
 	ctx, boardCollection, userCollection, taskCollection, expiresCollection = initializer.MongoConnect()
