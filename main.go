@@ -5,7 +5,7 @@
 // It is a standalone API
 //
 //	Schemes: http, https
-//	Host: https://kanban-api-app-jaystar-bee-dev.apps.sandbox-m3.1530.p1.openshiftapps.com/
+//	Host: https://kanban-api-app-jaystar-bee-dev.apps.sandbox-m3.1530.p1.openshiftapps.com
 //	BasePath: /api/v1/
 //	Version: 1.0.0
 //	Contact: John Ayilara <jbayilara@gmail.com>	https://bolu.netlify.app
