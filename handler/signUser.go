@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -184,29 +185,21 @@ func (handler *AuthHandler) Logout(c *gin.Context) {
 	}
 	user, _ := c.Get("user")
 	fmt.Println(user.(*helpers.Claims).Username)
-	expireTime := user.(*helpers.Claims).StandardClaims.ExpiresAt
+	// expireTime := user.(*helpers.Claims).StandardClaims.ExpiresAt
 
 	reqToken := strings.Split(token, "Bearer ")[1]
-	secs := time.Duration(expireTime) * time.Second
-	err = handler.redisClient.Set(reqToken, "Invalid", secs).Err()
+	// secs := time.Duration(expireTime) * time.Second
+	res, err := handler.expires.InsertOne(handler.ctx, bson.M{"token": reqToken})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": "Unabale to logout at the moment",
+			"message": "Something went wrong",
 			"error":   err.Error(),
 		})
 		return
 	}
-	// res, err := handler.expires.InsertOne(handler.ctx, reqToken)
-	// if err != nil {
-	// 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-	// 		"message": "Unabale to logout at the moment",
-	// 		"error":   err.Error(),
-	// 	})
-	// 	return
-	// }
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "User logged out",
-		// "data":    res,
+		"data":    res,
 	})
 }
