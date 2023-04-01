@@ -70,7 +70,7 @@ func main() {
 
 	router.Use(cors.New(
 		cors.Config{
-			AllowOrigins: []string{"http://127.0.0.1:5173", "http://localhost:5173", "https://127.0.0.1:5173", "http://kanbantask.netlify.app", "https://kanbantask.netlify.app"},
+			AllowOrigins: []string{"http://127.0.0.1:5173", "https://127.0.0.1:5173", "http://kanbantask.netlify.app", "https://kanbantask.netlify.app", "https://kanban-api-jay-jaystar-bee-dev.apps.sandbox-m3.1530.p1.openshiftapps.com"},
 			AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
 			AllowHeaders: []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods", "Access-Control-Allow-Credentials", "Access-Control-Max-Age"},
 
