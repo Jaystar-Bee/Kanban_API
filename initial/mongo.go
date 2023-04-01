@@ -5,11 +5,12 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
+
+// "github.com/joho/godotenv"
 
 func MongoConnect() (ctx context.Context, boardCollection *mongo.Collection, userCollection *mongo.Collection, taskCollection *mongo.Collection, expiresCollection *mongo.Collection) {
 
