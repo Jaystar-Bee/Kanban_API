@@ -23,6 +23,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"kanban-task/auths"
@@ -32,10 +33,9 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-
-// "github.com/joho/godotenv"
 
 var (
 	PORT              = ":3000"
@@ -52,10 +52,10 @@ var (
 )
 
 func init() {
-	// err := godotenv.Load(".env")
-	// if err != nil {
-	// 	log.Println("Unable to load .env file")
-	// }
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Unable to load .env file")
+	}
 
 	ctx, boardCollection, userCollection, taskCollection, expiresCollection = initializer.MongoConnect()
 	redisClient = initializer.RedisConnect()
@@ -70,11 +70,13 @@ func main() {
 
 	router.Use(cors.New(
 		cors.Config{
-			AllowOrigins: []string{"http://127.0.0.1:5173", "https://127.0.0.1:5173", "http://kanbantask.netlify.app", "https://kanbantask.netlify.app", "https://kanban-api-jay-jaystar-bee-dev.apps.sandbox-m3.1530.p1.openshiftapps.com"},
-			AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
-			AllowHeaders: []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods", "Access-Control-Allow-Credentials", "Access-Control-Max-Age"},
-
-			MaxAge: 12 * time.Hour,
+			AllowAllOrigins: true,
+			AllowMethods:    []string{"GET", "POST", "PUT", "DELETE"},
+			AllowHeaders: []string{"Origin", "Content-Type",
+				"Authorization", "Accept", "X-Requested-With", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods", "Access-Control-Allow-Credentials", "Access-Control-Max-Age"},
+			ExposeHeaders:    []string{"Content-Length"},
+			AllowCredentials: true,
+			MaxAge:           12 * time.Hour,
 		}))
 
 	initRoute := router.Group("/api/v1")
