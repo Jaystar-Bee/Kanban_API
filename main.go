@@ -33,7 +33,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
-	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -104,6 +103,10 @@ func main() {
 	taskRoute.DELETE("/:id", taskHandler.DeleteTaskHandler)
 	taskRoute.PUT("/:id", taskHandler.UpdateTaskHandler)
 
-	router.Run(PORT)
+	err := router.Run(PORT)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	fmt.Println("Serve running on port: ", PORT)
 }
