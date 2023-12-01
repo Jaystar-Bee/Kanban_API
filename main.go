@@ -24,7 +24,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
 
 	"kanban-task/auths"
 	handlers "kanban-task/handler"
@@ -67,16 +66,13 @@ func init() {
 func main() {
 	router := gin.Default()
 
-	router.Use(cors.New(
-		cors.Config{
-			AllowAllOrigins: true,
-			AllowMethods:    []string{"GET", "POST", "PUT", "DELETE"},
-			AllowHeaders: []string{"Origin", "Content-Type",
-				"Authorization", "Accept", "X-Requested-With", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods", "Access-Control-Allow-Credentials", "Access-Control-Max-Age"},
-			ExposeHeaders:    []string{"Content-Length"},
-			AllowCredentials: true,
-			MaxAge:           12 * time.Hour,
-		}))
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:5173/"},
+		AllowMethods:     []string{"PUT", "PATCH", "POST", "GET", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Type"},
+		AllowCredentials: true,
+	}))
 
 	initRoute := router.Group("/api/v1")
 	userRoute := initRoute.Group("/users")
@@ -86,7 +82,7 @@ func main() {
 	initRoute.Use(auths.AuthMiddleware(ctx, redisClient, expiresCollection))
 	initRoute.POST("/users/logout", authHandler.Logout)
 	boardRoute := initRoute.Group("/boards")
-	boardRoute.GET("/", boardHandler.ListBoardHandler)
+	boardRoute.GET("", boardHandler.ListBoardHandler)
 	boardRoute.POST("/", boardHandler.InsertBoardHandler)
 	boardRoute.GET("/:id", boardHandler.GetBoard)
 	boardRoute.DELETE("/:id", boardHandler.DeleteBoard)
