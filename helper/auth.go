@@ -24,7 +24,7 @@ type OutputToken struct {
 
 func GenerateToken(user model.User) (*OutputToken, error) {
 
-	expireTime := time.Now().Add(time.Hour * 5)
+	expireTime := time.Now().Add(time.Hour * 24 * 7)
 	claims := &Claims{
 		Username:  user.Username,
 		UserID:    user.UserID,
@@ -55,7 +55,7 @@ func ValidateToken(tokenValue string) (*jwt.Token, *Claims, error) {
 	if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 30*time.Minute {
 		return token, claims, err
 	}
-	expireTime := time.Now().Add(2 * time.Hour)
+	expireTime := time.Now().Add(6 * time.Hour)
 	claims.ExpiresAt = expireTime.Unix()
 	tkn := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
 	tkn.SignedString([]byte(os.Getenv("JWT_SECRET")))
